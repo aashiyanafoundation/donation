@@ -360,6 +360,159 @@
     .qr-frame { width: 170px; height: 170px; }
     .donation-options { grid-template-columns: 1fr; }
   }
+
+    .custom-amount-note {
+      margin-top: -4px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #8b6f63;
+    }
+
+    .large-donation-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .large-donation-modal.is-open {
+      display: flex;
+    }
+
+    .large-donation-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.62);
+      backdrop-filter: blur(4px);
+    }
+
+    .large-donation-dialog {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 420px);
+      max-height: 90vh;
+      overflow-y: auto;
+      background: #fffaf7;
+      border: 1px solid #eadbd3;
+      border-radius: 22px;
+      padding: 26px 20px 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+      text-align: left;
+    }
+
+    .large-donation-close {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 50%;
+      background: #f2e7e1;
+      color: #5b4037;
+      font-size: 25px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .large-donation-icon {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: #f2e7e1;
+      font-size: 23px;
+      margin-bottom: 14px;
+    }
+
+    .large-donation-dialog h3 {
+      margin: 0 42px 8px 0;
+      color: #3f2b25;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    .large-donation-dialog > p {
+      margin: 0 0 16px;
+      color: #6f5a51;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .large-bank-card {
+      display: grid;
+      gap: 10px;
+      padding: 15px;
+      border-radius: 15px;
+      background: #f7eee9;
+    }
+
+    .large-bank-card div {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      border-bottom: 1px solid rgba(91,64,55,.12);
+      padding-bottom: 8px;
+    }
+
+    .large-bank-card div:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .large-bank-card span {
+      color: #866f66;
+      font-size: 12px;
+    }
+
+    .large-bank-card strong {
+      color: #49342d;
+      font-size: 13px;
+      text-align: right;
+      word-break: break-word;
+    }
+
+    .large-donation-note {
+      margin-top: 14px !important;
+      font-size: 12px !important;
+    }
+
+    .large-donation-ok {
+      width: 100%;
+      min-height: 48px;
+      border: 0;
+      border-radius: 12px;
+      background: #5b4037;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    body.modal-open {
+      overflow: hidden;
+    }
+
+    @media (max-width: 480px) {
+      .large-donation-dialog {
+        padding: 24px 16px 16px;
+        border-radius: 18px;
+      }
+
+      .large-bank-card div {
+        display: grid;
+        gap: 3px;
+      }
+
+      .large-bank-card strong {
+        text-align: left;
+      }
+    }
+
 </style>
 </head>
 <body>
@@ -402,7 +555,7 @@
 
     <div class="custom-box" id="customBox" style="display:none;">
       <input type="number" min="1" step="1" class="custom-amount" id="customAmount"
-             placeholder="Enter donation amount (₹)">
+             placeholder="Enter donation amount (₹)" max="100000" inputmode="numeric" aria-describedby="customAmountNote">
       <a class="donate-btn custom-pay-btn" id="customPayBtn" href="#" role="button">
         Donate Custom Amount
       </a>
@@ -546,6 +699,34 @@
     renderQR(amount);
   });
 </script>
+
+
+  <!-- Large donation bank-transfer popup -->
+  <div class="large-donation-modal" id="largeDonationModal" aria-hidden="true">
+    <div class="large-donation-backdrop" id="largeDonationBackdrop"></div>
+    <div class="large-donation-dialog" role="dialog" aria-modal="true"
+         aria-labelledby="largeDonationTitle" aria-describedby="largeDonationText">
+      <button class="large-donation-close" id="largeDonationClose" type="button" aria-label="Close">×</button>
+      <div class="large-donation-icon">🏦</div>
+      <h3 id="largeDonationTitle">Donation above ₹1,00,000</h3>
+      <p id="largeDonationText">
+        For donations above ₹1,00,000, please use a direct bank transfer.
+      </p>
+
+      <div class="large-bank-card">
+        <div><span>Account name</span><strong>M/S. Aashiyana Foundation</strong></div>
+        <div><span>Bank name</span><strong>ICICI Bank</strong></div>
+        <div><span>Account number</span><strong>230805002136</strong></div>
+        <div><span>IFSC</span><strong>ICICI0002308</strong></div>
+        <div><span>Branch</span><strong>Bodakdev</strong></div>
+      </div>
+
+      <p class="large-donation-note">
+        Please verify the bank details before making a transfer.
+      </p>
+      <button class="large-donation-ok" id="largeDonationOk" type="button">Okay</button>
+    </div>
+  </div>
 
 </body>
 </html>
