@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Donate — Aashiyana Animal Foundation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --paper: #F3ECDE;
+    --card: #FBF8F2;
+    --ink: #2B2118;
+    --ink-soft: #5B4E42;
+    --brown-deep: #5F3319;
+    --clay: #93532F;
+    --taupe: #B99C8D;
+    --taupe-soft: #E7DACE;
+    --line: #DFD0BC;
+    --good: #4C6B4F;
+    --radius-card: 22px;
+    --radius-inner: 14px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 40px 16px;
+    background: var(--paper);
+    background-image:
+      radial-gradient(circle at 15% 8%, rgba(95,51,25,0.05), transparent 45%),
+      radial-gradient(circle at 85% 92%, rgba(185,156,141,0.10), transparent 50%);
+    font-family: 'Work Sans', sans-serif;
+    color: var(--ink);
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 460px;
+    background: var(--card);
+    border-radius: var(--radius-card);
+    box-shadow: 0 1px 2px rgba(43,33,24,0.06), 0 18px 40px -20px rgba(43,33,24,0.28);
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+
+  /* Header */
+  .header {
+    padding: 28px 26px 22px;
+    text-align: center;
+    background: linear-gradient(180deg, #FFFDF9 0%, var(--card) 100%);
+  }
+
+  .mark {
+    display: block;
+    width: auto;
+    height: 52px;
+    margin: 0 auto 14px;
+  }
+
+  .header h1 {
+    font-family: 'Spectral', serif;
+    font-weight: 600;
+    font-size: 26px;
+    line-height: 1.15;
+    margin: 0 0 8px;
+    color: var(--brown-deep);
+  }
+
+  .header p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    max-width: 32ch;
+    margin: 0 auto;
+  }
+
+  /* Feather divider */
+  .feather-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 26px;
+  }
+  .feather-divider .line { flex: 1; height: 1px; background: var(--line); }
+  .feather-divider svg { flex-shrink: 0; opacity: 0.55; }
+
+  /* Sections */
+  .section {
+    padding: 26px;
+  }
+
+  .section-label {
+    font-family: 'Spectral', serif;
+    font-weight: 600;
+    font-size: 19px;
+    color: var(--ink);
+    margin: 0 0 4px;
+  }
+
+  .section-sub {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin: 0 0 18px;
+    line-height: 1.5;
+  }
+
+  /* QR block */
+  .qr-frame {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 18px;
+    background: #FFFFFF;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-inner);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+  }
+  .qr-frame img, .qr-frame canvas {
+    width: 100% !important;
+    height: 100% !important;
+    image-rendering: pixelated;
+  }
+
+  .upi-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .upi-id {
+    flex: 1;
+    min-width: 0;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13.5px;
+    color: var(--ink);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+  }
+
+  .copy-btn {
+    flex-shrink: 0;
+    background: var(--brown-deep);
+    color: #FBF8F2;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-family: 'Work Sans', sans-serif;
+    font-weight: 600;
+    font-size: 13.5px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .copy-btn:hover { background: #4C2913; }
+  .copy-btn:active { transform: translateY(1px); }
+  .copy-btn.copied { background: var(--good); }
+
+  /* Amount chips */
+  .amounts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .amount-chip {
+    flex: 1 1 auto;
+    min-width: 64px;
+    text-align: center;
+    padding: 10px 6px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: #FFFFFF;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .amount-chip:hover { border-color: var(--taupe); }
+  .amount-chip.active {
+    background: var(--brown-deep);
+    border-color: var(--brown-deep);
+    color: #FBF8F2;
+  }
+
+  .custom-amount {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: #FFFFFF;
+    font-family: 'Work Sans', sans-serif;
+    font-size: 13.5px;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .custom-amount::placeholder { color: #A6957F; }
+  .custom-amount:focus { outline: 2px solid var(--taupe); outline-offset: 1px; }
+
+  .steps {
+    margin: 18px 0 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+  }
+  .steps li {
+    counter-increment: step;
+    display: flex;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+  .steps li::before {
+    content: counter(step);
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--taupe-soft);
+    color: var(--brown-deep);
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+
+  .disclaimer {
+    margin-top: 18px;
+    padding: 12px 14px;
+    background: #FBF3E4;
+    border: 1px solid #EBDBB8;
+    border-radius: 10px;
+    font-size: 12px;
+    color: #7A5F2E;
+    line-height: 1.5;
+  }
+
+  /* Bank section */
+  .bank-rows {
+    border-top: 1px solid var(--line);
+  }
+  .bank-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .bank-row .label {
+    font-size: 13px;
+    color: var(--ink-soft);
+    flex-shrink: 0;
+  }
+  .bank-row .value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    text-align: right;
+    word-break: break-word;
+  }
+
+  .placeholder-note {
+    margin-top: 16px;
+    font-size: 12px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  .footer {
+    text-align: center;
+    padding: 18px 26px 26px;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  @media (max-width: 380px) {
+    .header h1 { font-size: 22px; }
+    .qr-frame { width: 170px; height: 170px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <div class="header">
+    <img class="mark" src="logo.jpg" alt="Aashiyana Animal Foundation logo">
+    <h1>Aashiyana Animal Foundation</h1>
+    <p>Every contribution helps us feed, shelter and care for animals in need.</p>
+  </div>
+
+  <div class="feather-divider">
+    <div class="line"></div>
+    <svg width="22" height="14" viewBox="0 0 22 14" fill="none">
+      <path d="M1 12 C6 2, 16 2, 21 12" stroke="#B99C8D" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+    </svg>
+    <div class="line"></div>
+  </div>
+
+  <!-- UPI / QR section -->
+  <div class="section">
+    <p class="section-label">Scan &amp; donate</p>
+    <p class="section-sub">Open any UPI app, scan the code below, and complete your donation in a few seconds.</p>
+
+    <div class="qr-frame" id="qrFrame"></div>
+
+    <div class="upi-row">
+      <div class="upi-id" id="upiIdText">MSAASHIYANAFOUNDATION.eazypay@icici</div>
+      <button class="copy-btn" id="copyBtn">Copy UPI ID</button>
+    </div>
+
+    <div class="amounts" id="amountChips">
+      <div class="amount-chip" data-amount="500">₹500</div>
+      <div class="amount-chip" data-amount="1000">₹1,000</div>
+      <div class="amount-chip" data-amount="2500">₹2,500</div>
+      <div class="amount-chip" data-amount="5000">₹5,000</div>
+      <div class="amount-chip" data-amount="custom">Custom</div>
+    </div>
+
+    <input type="number" min="1" class="custom-amount" id="customAmount" placeholder="Enter custom amount (updates the QR)" style="display:none;">
+
+    <ol class="steps">
+      <li>Open GPay, PhonePe, Paytm or any UPI app.</li>
+      <li>Scan the QR, or search the UPI ID above.</li>
+      <li>Choose an amount, or enter your own.</li>
+      <li>Complete the payment in your UPI app.</li>
+    </ol>
+
+    <div class="disclaimer">
+      This page does not automatically verify UPI payments and does not generate payment confirmations. Please keep your app's receipt for your records.
+    </div>
+  </div>
+
+  <div class="feather-divider">
+    <div class="line"></div>
+    <svg width="22" height="14" viewBox="0 0 22 14" fill="none">
+      <path d="M1 12 C6 2, 16 2, 21 12" stroke="#B99C8D" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+    </svg>
+    <div class="line"></div>
+  </div>
+
+  <!-- Bank section -->
+  <div class="section">
+    <p class="section-label">Direct bank support</p>
+    <p class="section-sub">Prefer a bank transfer? Use the details below.</p>
+
+    <div class="bank-rows">
+      <div class="bank-row"><span class="label">Account name</span><span class="value">M/S. Aashiyana Foundation</span></div>
+      <div class="bank-row"><span class="label">Bank name</span><span class="value">ICICI Bank</span></div>
+      <div class="bank-row"><span class="label">Account number</span><span class="value">230805002136</span></div>
+      <div class="bank-row"><span class="label">IFSC</span><span class="value">ICICI0002308</span></div>
+      <div class="bank-row"><span class="label">Branch</span><span class="value">Bodakdev</span></div>
+    </div>
+
+    <p class="placeholder-note">Bank name, IFSC and branch are placeholders — replace with verified details before publishing.</p>
+  </div>
+
+  <div class="footer">Thank you for supporting Aashiyana Animal Foundation 🐾</div>
+
+</div>
+
+<script>
+  const UPI_ID = "MSAASHIYANAFOUNDATION.eazypay@icici";
+  const PAYEE_NAME = "M/S. AASHIYANA FOUNDATION";
+  const qrFrame = document.getElementById('qrFrame');
+  let qr = null;
+
+  function buildUpiUri(amount) {
+    let uri = `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(PAYEE_NAME)}&cu=INR`;
+    if (amount) uri += `&am=${encodeURIComponent(amount)}`;
+    return uri;
+  }
+
+  function renderQR(amount) {
+    qrFrame.innerHTML = '';
+    qr = new QRCode(qrFrame, {
+      text: buildUpiUri(amount),
+      width: 200,
+      height: 200,
+      colorDark: "#2B2118",
+      colorLight: "#FFFFFF",
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  }
+
+  renderQR(null);
+
+  // Copy UPI ID
+  const copyBtn = document.getElementById('copyBtn');
+  copyBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(UPI_ID);
+      copyBtn.textContent = "Copied!";
+      copyBtn.classList.add('copied');
+      setTimeout(() => {
+        copyBtn.textContent = "Copy UPI ID";
+        copyBtn.classList.remove('copied');
+      }, 1600);
+    } catch (e) {
+      copyBtn.textContent = "Copy failed";
+      setTimeout(() => { copyBtn.textContent = "Copy UPI ID"; }, 1600);
+    }
+  });
+
+  // Amount chips
+  const chips = document.querySelectorAll('.amount-chip');
+  const customInput = document.getElementById('customAmount');
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+
+      if (chip.dataset.amount === 'custom') {
+        customInput.style.display = 'block';
+        customInput.focus();
+        renderQR(customInput.value || null);
+      } else {
+        customInput.style.display = 'none';
+        renderQR(chip.dataset.amount);
+      }
+    });
+  });
+
+  customInput.addEventListener('input', () => {
+    renderQR(customInput.value || null);
+  });
+</script>
+
+</body>
+</html>
