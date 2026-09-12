@@ -995,7 +995,7 @@
       return;
     }
 
-    const upiLink = upiPaymentLink(amount);
+    const upiLink = buildUpiUri(amount);
     closeDonationConfirmation();
 
     // Use the UPI deep link only after the user confirms payment.
@@ -1022,8 +1022,5 @@
     }
   });
 </script>
-
-
-
 </body>
 </html>
