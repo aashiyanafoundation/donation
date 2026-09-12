@@ -813,55 +813,166 @@
     }
   });
 
-  // Mobile UPI donation buttons
-  const donationButtons = document.querySelectorAll('.donate-btn[data-amount]');
+  // Donation amount selection + confirmation flow
+  const donationButtons = document.querySelectorAll('.amount-option[data-amount]');
   const customDonateBtn = document.getElementById('customDonateBtn');
   const customBox = document.getElementById('customBox');
   const customInput = document.getElementById('customAmount');
-  const customPayBtn = document.getElementById('customPayBtn');
 
-  function upiPaymentLink(amount) {
-    return buildUpiUri(amount);
+  const selectedAmountText = document.getElementById('selectedAmount');
+  const proceedDonationBtn = document.getElementById('proceedDonationBtn');
+
+  const donationConfirmModal = document.getElementById('donationConfirmModal');
+  const donationConfirmClose = document.getElementById('donationConfirmClose');
+  const donationConfirmBackdrop = document.getElementById('donationConfirmBackdrop');
+  const donationCancelBtn = document.getElementById('donationCancelBtn');
+  const donationPayBtn = document.getElementById('donationPayBtn');
+  const confirmAmount = document.getElementById('confirmAmount');
+
+  const largeDonationModal = document.getElementById('largeDonationModal');
+  const largeDonationClose = document.getElementById('largeDonationClose');
+  const largeDonationBackdrop = document.getElementById('largeDonationBackdrop');
+  const largeDonationOk = document.getElementById('largeDonationOk');
+
+  let selectedDonationAmount = 2000;
+
+  function formatIndianAmount(amount) {
+    return new Intl.NumberFormat('en-IN').format(amount);
   }
 
-  donationButtons.forEach(button => {
-    const amount = button.dataset.amount;
-    button.href = upiPaymentLink(amount);
+  function selectDonationAmount(amount, selectedButton = null) {
+    selectedDonationAmount = amount;
 
+    donationButtons.forEach(button => button.classList.remove('selected'));
+    if (selectedButton) selectedButton.classList.add('selected');
+
+    const formatted = `₹${formatIndianAmount(amount)}`;
+    selectedAmountText.textContent = formatted;
+    proceedDonationBtn.textContent = `Donate ${formatted}`;
+    proceedDonationBtn.disabled = false;
+
+    renderQR(amount);
+  }
+
+  // ₹2,000 / ₹5,000 / ₹8,000 / ₹10,000 buttons
+  donationButtons.forEach(button => {
     button.addEventListener('click', () => {
-      renderQR(amount);
+      const amount = Number(button.dataset.amount);
+      customBox.style.display = 'none';
+      customInput.value = '';
+      customInput.setCustomValidity('');
+      selectDonationAmount(amount, button);
     });
   });
 
+  // Custom amount button
   customDonateBtn.addEventListener('click', () => {
     customBox.style.display = 'grid';
+    donationButtons.forEach(button => button.classList.remove('selected'));
     customInput.focus();
   });
 
+  // Custom amount input
   customInput.addEventListener('input', () => {
     const amount = Number(customInput.value);
 
+    if (amount > 100000) {
+      customInput.setCustomValidity('Maximum donation through UPI is ₹1,00,000.');
+      selectedAmountText.textContent = 'Maximum ₹1,00,000';
+      proceedDonationBtn.textContent = 'Enter a valid amount';
+      proceedDonationBtn.disabled = true;
+      renderQR(null);
+      return;
+    }
+
+    customInput.setCustomValidity('');
+
     if (amount > 0) {
-      const link = upiPaymentLink(amount);
-      customPayBtn.href = link;
-      renderQR(amount);
+      selectDonationAmount(amount);
     } else {
-      customPayBtn.href = '#';
+      selectedAmountText.textContent = 'Enter an amount';
+      proceedDonationBtn.textContent = 'Donate';
+      proceedDonationBtn.disabled = true;
       renderQR(null);
     }
   });
 
-  customPayBtn.addEventListener('click', (event) => {
-    const amount = Number(customInput.value);
+  function openDonationConfirmation() {
+    const amount = Number(selectedDonationAmount);
 
-    if (!amount || amount <= 0) {
-      event.preventDefault();
-      customInput.focus();
-      customInput.reportValidity();
+    if (!amount || amount <= 0) return;
+
+    if (amount > 100000) {
+      openLargeDonationModal();
       return;
     }
 
-    renderQR(amount);
+    const formatted = `₹${formatIndianAmount(amount)}`;
+    confirmAmount.textContent = formatted;
+    donationPayBtn.textContent = `Pay ${formatted}`;
+    donationConfirmModal.classList.add('is-open');
+    donationConfirmModal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+  }
+
+  function closeDonationConfirmation() {
+    donationConfirmModal.classList.remove('is-open');
+    donationConfirmModal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+  }
+
+  function openLargeDonationModal() {
+    largeDonationModal.classList.add('is-open');
+    largeDonationModal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+  }
+
+  function closeLargeDonationModal() {
+    largeDonationModal.classList.remove('is-open');
+    largeDonationModal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+  }
+
+  // Separate Donate button opens confirmation popup
+  proceedDonationBtn.addEventListener('click', openDonationConfirmation);
+
+  // Confirmation popup -> UPI app
+  donationPayBtn.addEventListener('click', () => {
+    const amount = Number(selectedDonationAmount);
+
+    if (!amount || amount <= 0) return;
+
+    if (amount > 100000) {
+      closeDonationConfirmation();
+      openLargeDonationModal();
+      return;
+    }
+
+    const upiLink = upiPaymentLink(amount);
+    closeDonationConfirmation();
+
+    // Use the UPI deep link only after the user confirms payment.
+    window.location.href = upiLink;
+  });
+
+  donationConfirmClose.addEventListener('click', closeDonationConfirmation);
+  donationConfirmBackdrop.addEventListener('click', closeDonationConfirmation);
+  donationCancelBtn.addEventListener('click', closeDonationConfirmation);
+
+  largeDonationClose.addEventListener('click', closeLargeDonationModal);
+  largeDonationBackdrop.addEventListener('click', closeLargeDonationModal);
+  largeDonationOk.addEventListener('click', closeLargeDonationModal);
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+
+    if (donationConfirmModal.classList.contains('is-open')) {
+      closeDonationConfirmation();
+    }
+
+    if (largeDonationModal.classList.contains('is-open')) {
+      closeLargeDonationModal();
+    }
   });
 </script>
 
