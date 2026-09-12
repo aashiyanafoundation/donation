@@ -513,6 +513,161 @@
       }
     }
 
+
+    .amount-option {
+      border: 2px solid transparent;
+      cursor: pointer;
+      appearance: none;
+    }
+
+    .amount-option.selected {
+      border-color: #5b4037;
+      box-shadow: 0 0 0 3px rgba(91,64,55,.12);
+      transform: translateY(-1px);
+    }
+
+    .selected-donation {
+      margin-top: 14px;
+      padding: 13px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border-radius: 12px;
+      background: #f7eee9;
+      color: #6f5a51;
+      font-size: 13px;
+    }
+
+    .selected-donation strong {
+      color: #49342d;
+      font-size: 17px;
+    }
+
+    .proceed-donation-btn {
+      width: 100%;
+      margin-top: 12px;
+      min-height: 52px;
+      border: 0;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .donation-confirm-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+
+    .donation-confirm-modal.is-open {
+      display: flex;
+    }
+
+    .donation-confirm-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,.62);
+      backdrop-filter: blur(4px);
+    }
+
+    .donation-confirm-dialog {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 420px);
+      background: #fffaf7;
+      border: 1px solid #eadbd3;
+      border-radius: 22px;
+      padding: 26px 20px 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+      text-align: center;
+    }
+
+    .donation-confirm-close {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 50%;
+      background: #f2e7e1;
+      color: #5b4037;
+      font-size: 25px;
+      cursor: pointer;
+    }
+
+    .donation-confirm-icon {
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 13px;
+      border-radius: 15px;
+      background: #f2e7e1;
+      font-size: 25px;
+    }
+
+    .donation-confirm-label {
+      margin: 0 0 7px;
+      color: #8b6f63;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+    }
+
+    .donation-confirm-dialog h3 {
+      margin: 0 0 10px;
+      color: #3f2b25;
+      font-size: 23px;
+    }
+
+    .donation-confirm-text {
+      margin: 0 auto 20px;
+      max-width: 330px;
+      color: #6f5a51;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .donation-confirm-actions {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 10px;
+    }
+
+    .donation-cancel-btn,
+    .donation-pay-btn {
+      min-height: 48px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .donation-cancel-btn {
+      border: 1px solid #d8c7bf;
+      background: #fff;
+      color: #5b4037;
+    }
+
+    .donation-pay-btn {
+      border: 0;
+      background: #5b4037;
+      color: #fff;
+    }
+
+    @media (max-width: 380px) {
+      .donation-confirm-actions {
+        grid-template-columns: 1fr;
+      }
+    }
+
 </style>
 </head>
 <body>
@@ -546,22 +701,32 @@
     </div>
 
     <div class="donation-options" id="donationOptions">
-      <a class="donate-btn" data-amount="2000" href="#" role="button">Donate ₹2,000</a>
-      <a class="donate-btn" data-amount="5000" href="#" role="button">Donate ₹5,000</a>
-      <a class="donate-btn" data-amount="8000" href="#" role="button">Donate ₹8,000</a>
-      <a class="donate-btn" data-amount="10000" href="#" role="button">Donate ₹10,000</a>
-      <button class="donate-btn custom-btn" id="customDonateBtn" type="button">Custom Amount</button>
-    </div>
+  <button class="donate-btn amount-option selected" data-amount="2000" type="button">₹2,000</button>
+  <button class="donate-btn amount-option" data-amount="5000" type="button">₹5,000</button>
+  <button class="donate-btn amount-option" data-amount="8000" type="button">₹8,000</button>
+  <button class="donate-btn amount-option" data-amount="10000" type="button">₹10,000</button>
+  <button class="donate-btn amount-option custom-btn" id="customDonateBtn" type="button">Custom</button>
+</div>
 
-    <div class="custom-box" id="customBox" style="display:none;">
-      <input type="number" min="1" step="1" class="custom-amount" id="customAmount"
-             placeholder="Enter donation amount (₹)" max="100000" inputmode="numeric" aria-describedby="customAmountNote">
-      <a class="donate-btn custom-pay-btn" id="customPayBtn" href="#" role="button">
-        Donate Custom Amount
-      </a>
-    </div>
+<div class="selected-donation" id="selectedDonation" aria-live="polite">
+  <span>Selected donation</span>
+  <strong id="selectedAmount">₹2,000</strong>
+</div>
 
-    <p class="mobile-pay-note">
+<button class="donate-btn proceed-donation-btn" id="proceedDonationBtn" type="button">
+  Donate ₹2,000
+</button>
+
+<div class="custom-box" id="customBox" style="display:none;">
+  <input type="number" min="1" max="100000" step="1" class="custom-amount"
+         id="customAmount" inputmode="numeric" placeholder="Enter donation amount (₹)"
+         aria-describedby="customAmountNote">
+  <div class="custom-amount-note" id="customAmountNote">
+    Maximum UPI donation: ₹1,00,000. For more, use bank transfer.
+  </div>
+</div>
+
+<p class="mobile-pay-note">
       On mobile, tap a donation button to open your UPI payment app with the amount already filled.
     </p>
 
@@ -700,6 +865,26 @@
   });
 </script>
 
+
+
+  <!-- Donation confirmation popup -->
+  <div class="donation-confirm-modal" id="donationConfirmModal" aria-hidden="true">
+    <div class="donation-confirm-backdrop" id="donationConfirmBackdrop"></div>
+    <div class="donation-confirm-dialog" role="dialog" aria-modal="true"
+         aria-labelledby="donationConfirmTitle">
+      <button class="donation-confirm-close" id="donationConfirmClose" type="button" aria-label="Close">×</button>
+      <div class="donation-confirm-icon">🐾</div>
+      <p class="donation-confirm-label">Donation confirmation</p>
+      <h3 id="donationConfirmTitle">You selected <span id="confirmAmount">₹2,000</span></h3>
+      <p class="donation-confirm-text">
+        You are going to the payment method to complete your donation.
+      </p>
+      <div class="donation-confirm-actions">
+        <button class="donation-cancel-btn" id="donationCancelBtn" type="button">Cancel</button>
+        <button class="donation-pay-btn" id="donationPayBtn" type="button">Continue to Payment</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Large donation bank-transfer popup -->
   <div class="large-donation-modal" id="largeDonationModal" aria-hidden="true">
